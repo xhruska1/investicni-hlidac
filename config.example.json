@@ -1,0 +1,58 @@
+{
+  "ntfy_url": "https://ntfy.sh/ZDE-TVOJE-TAJNE-TEMA",
+  "claude_cmd": "claude",
+  "claude_timeout_s": 180,
+
+  "limits": {
+    "max_per_buy_czk": 1500,
+    "max_per_month_czk": 5000,
+    "base_counts_toward_monthly_limit": false
+  },
+
+  "monthly_reminder": {
+    "enabled": true,
+    "from_day": 1
+  },
+
+  "assets": [
+    {
+      "id": "sp500",
+      "name": "S&P 500 ETF",
+      "ticker": "SXR8.DE",
+      "monthly_base_czk": 1000,
+      "dip_rules": [
+        { "pct_below_ath": 10, "amount_czk": 1000 },
+        { "pct_below_ath": 20, "amount_czk": 1500 }
+      ]
+    },
+    {
+      "id": "world",
+      "name": "MSCI World ETF",
+      "ticker": "EUNL.DE",
+      "monthly_base_czk": 1000,
+      "dip_rules": [
+        { "pct_below_ath": 10, "amount_czk": 1000 },
+        { "pct_below_ath": 20, "amount_czk": 1500 }
+      ]
+    },
+    {
+      "id": "gold",
+      "name": "Zlato (Xetra-Gold ETC)",
+      "ticker": "4GLD.DE",
+      "monthly_base_czk": 500,
+      "dip_rules": [
+        { "pct_below_ath": 10, "amount_czk": 1000 }
+      ]
+    },
+    {
+      "id": "btc",
+      "name": "Bitcoin",
+      "ticker": "BTC-USD",
+      "monthly_base_czk": 500,
+      "dip_rules": [
+        { "pct_below_ath": 30, "amount_czk": 500 },
+        { "pct_below_ath": 50, "amount_czk": 1500 }
+      ]
+    }
+  ]
+}

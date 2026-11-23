@@ -1,0 +1,65 @@
+name: Hlidac investic
+
+on:
+  schedule:
+    # cron je v UTC; skript sám pustí jen první běh po 9:00 pražského času (léto i zima),
+    # poslední řádek je záloha, kdyby GitHub některý plánovaný běh vynechal
+    - cron: "5 7 * * *"
+    - cron: "5 8 * * *"
+    - cron: "5 10 * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Režim ručního spuštění"
+        type: choice
+        options: [dry-run, test, normal]
+        default: dry-run
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hlidac
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Instalace
+        run: |
+          pip install -r requirements.txt
+          npm install -g @anthropic-ai/claude-code
+
+      - name: Spuštění hlídače
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          NTFY_URL: ${{ secrets.NTFY_URL }}
+          CLAUDE_CMD: claude
+        run: |
+          case "${{ github.event.inputs.mode }}" in
+            dry-run) python hlidac.py --dry-run ;;
+            test)    python hlidac.py --test ;;
+            normal)  python hlidac.py ;;
+            *)       python hlidac.py --daily-after 9 ;;
+          esac
+
+      - name: Uložení stavu
+        if: always()
+        run: |
+          git config user.name "hlidac-bot"
+          git config user.email "hlidac-bot@users.noreply.github.com"
+          git add -f state.json
+          git diff --cached --quiet || (git commit -m "Stav $(TZ=Europe/Prague date +%F)" && git push)
